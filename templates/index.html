@@ -2,34 +2,42 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Görsel Analiz</title>
+    <title>IGAS - Görsel Analiz Demo</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .container { max-width: 600px; margin: auto; }
         .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+        .loading { display: none; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Görsel Analiz Sistemi</h2>
-        <form action="/analyze" method="POST" enctype="multipart/form-data">
+        <h2>IGAS - Görsel Analiz Sistemi Demo</h2>
+        <p>Bu demo, IGAS (Image Analysis Service) uygulamasını test etmek için tasarlanmıştır. Bir görsel yükleyerek güvenlik risklerini ve önerileri analiz edebilirsiniz. Lütfen bir fotoğraf yükleyin ve 'Analiz Et' butonuna basın.</p>
+        <form action="/analyze" method="POST" enctype="multipart/form-data" id="uploadForm">
             <label for="image">Görsel Yükle:</label><br>
             <input type="file" name="image" id="image" accept="image/*" required><br><br>
             <input type="submit" value="Analiz Et">
         </form>
+        <div class="loading" id="loading">Analiz yapılıyor, lütfen bekleyin...</div>
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        document.querySelector('form').addEventListener('submit', async (e) => {
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            resultDiv.innerHTML = '';
+            loadingDiv.style.display = 'block';
+
             const formData = new FormData(e.target);
             const response = await fetch('/analyze', {
                 method: 'POST',
                 body: formData
             });
+            loadingDiv.style.display = 'none';
             const data = await response.json();
-            const resultDiv = document.getElementById('result');
             if (data.error) {
                 resultDiv.innerHTML = `<p style="color: red;">Hata: ${data.error}</p>`;
             } else {
