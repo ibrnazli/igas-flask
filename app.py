@@ -3,6 +3,7 @@ from waitress import serve
 import cv2
 import numpy as np
 import tensorflow as tf
+import os  # os modülünü ekle
 
 app = Flask(__name__)
 
@@ -44,8 +45,8 @@ def analyze():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        import os
         os.remove(image_path)
 
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5001)
+    port = int(os.environ.get('PORT', 5000))  # Render'ın $PORT değişkenini kullan, yoksa 5000
+    serve(app, host='0.0.0.0', port=port)
