@@ -3,9 +3,14 @@ from waitress import serve
 import cv2
 import numpy as np
 import tensorflow as tf
-import os  # os modülünü ekle
+import os
 
 app = Flask(__name__)
+
+# Test route’u ekle
+@app.route('/')
+def home():
+    return "Merhaba, Render'dayım! Uygulama çalışıyor."
 
 def analyze_image(image_path):
     image = cv2.imread(image_path)
@@ -45,8 +50,11 @@ def analyze():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        os.remove(image_path)
+        try:
+            os.remove(image_path)
+        except Exception as e:
+            print(f"Dosya silinirken hata: {e}")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Render'ın $PORT değişkenini kullan, yoksa 5000
+    port = int(os.environ.get('PORT', 5000))
     serve(app, host='0.0.0.0', port=port)
