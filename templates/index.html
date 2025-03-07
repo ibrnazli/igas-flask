@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Görsel Analiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Görsel Analiz Sistemi</h2>
+        <form action="/analyze" method="POST" enctype="multipart/form-data">
+            <label for="image">Görsel Yükle:</label><br>
+            <input type="file" name="image" id="image" accept="image/*" required><br><br>
+            <input type="submit" value="Analiz Et">
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">Hata: ${data.error}</p>`;
+            } else {
+                resultDiv.innerHTML = `
+                    <h3>Riskler:</h3>
+                    <ul>${data.risks.map(risk => `<li>${risk}</li>`).join('')}</ul>
+                    <h3>Öneriler:</h3>
+                    <ul>${data.suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}</ul>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
